@@ -1,0 +1,1423 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Сайт благотворительного фонда Помогли лично",
+    "version": "1.0.0",
+    "description": "Запросы для получения и отправки данных на страницах сайта"
+  },
+  "servers": [
+    {
+      "url": "https://pomogilichno.ru/api/v1",
+      "description": "Пример домена, реальный нужно получить от заказчика"
+    }
+  ],
+  "paths": {
+    "/video": {
+      "get": {
+        "summary": "GET-запрос",
+        "description": "Возвращает JSON-объект с данными: список видео c описаниями",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Номер страницы для пагинации",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Количество элементов на странице",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Поле для сортировки",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["vrep_created_at", "vrep_id"]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Порядок сортировки",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Videos"
+                },
+                "example": {
+                  "video_reports": [
+                    {
+                      "vrep_id": "1",
+                      "vrep_description": "Подарки для Дарьи",
+                      "vrep_link": "https://vkvideo.ru/video-6371899_456239398",
+                      "vrep_created_at": "2012-04-23T18:25:43.511Z"
+                    },
+                    {
+                      "vrep_id": "2",
+                      "vrep_description": "Подарки для Дарьи",
+                      "vrep_link": "https://vkvideo.ru/video-6371899_456239398",
+                      "vrep_created_at": "2012-04-23T18:25:43.511Z"
+                    },
+                    {
+                      "vrep_id": "3",
+                      "vrep_description": "Подарки для Дарьи",
+                      "vrep_link": "https://vkvideo.ru/video-6371899_456239398",
+                      "vrep_created_at": "2012-04-23T18:25:43.511Z"
+                    },
+                    {
+                      "vrep_id": "4",
+                      "vrep_description": "Подарки для Дарьи",
+                      "vrep_link": "https://vkvideo.ru/video-6371899_456239398",
+                      "vrep_created_at": "2012-04-23T18:25:43.511Z"
+                    }
+                  ],
+                  "pagination": {
+                    "current_page": "1",
+                    "per_page": "4",
+                    "total": "8",
+                    "last_page": "2"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families": {
+      "get": {
+        "summary": "GET-запрос",
+        "description": "Возвращает JSON-объект с данными: список карточек семей",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Номер страницы для пагинации",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Количество элементов на странице",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Поле для сортировки",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["f_created_at", "f_id"]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Порядок сортировки",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Families"
+                },
+                "example": {
+                  "families": [
+                    {
+                      "f_id": "1",
+                      "f_name": "Семьи Марии",
+                      "fph_path": "http://fileserver.com/uploads/2023/03/photo.png",
+                      "f_short_desc": "Хорошая семья",
+                      "f_description": "Очень хорошая семья",
+                      "f_sum": "50000",
+                      "f_current_sum": "0",
+                      "f_created_at": "2012-04-23T18:25:43.511Z"
+                    },
+                    {
+                      "f_id": "2",
+                      "f_name": "Семьи Марфы",
+                      "fph_path": "http://fileserver.com/uploads/2023/03/photo.png",
+                      "f_short_desc": "Хорошая семья",
+                      "f_description": "Очень сильно хорошая семья",
+                      "f_sum": "100000",
+                      "f_current_sum": "100",
+                      "f_created_at": "2012-04-23T18:26:43.511Z"
+                    }
+                  ],
+                  "pagination": {
+                    "current_page": "1",
+                    "per_page": "4",
+                    "total": "8",
+                    "last_page": "2"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/main": {
+      "get": {
+        "summary": "GET-запрос",
+        "description": "Возвращает JSON-объект с данными: список пожертвований (совершенных через сайт), список статей блога, список фотоотчетов",
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MainPage"
+                },
+                "example": {
+                  "donations": [
+                    {
+                      "don_id": "1",
+                      "don_sum": "50",
+                      "don_name": "Сергей В.",
+                      "don_created_at": "2012-04-23T18:25:46.511Z"
+                    },
+                    {
+                      "don_id": "2",
+                      "don_sum": "100",
+                      "don_name": "",
+                      "don_created_at": "2012-04-23T18:25:47.511Z"
+                    }
+                  ],
+                  "blog": [
+                    {
+                      "article_id": "1",
+                      "article_name": "Интересная новость",
+                      "article_publish_date": "2012-04-23T18:28:43.511Z"
+                    },
+                    {
+                      "article_id": "2",
+                      "article_name": "Неинтересная новость",
+                      "article_publish_date": "2012-04-23T18:29:43.511Z"
+                    }
+                  ],
+                  "photo_reports": [
+                    {
+                      "phrep_id": "1",
+                      "phrep_description": "Семья Анны получила помощь",
+                      "phrep_created_at": "2012-04-23T19:25:43.511Z",
+                      "photos": [
+                        {
+                          "ph_id": "1",
+                          "phrep_path": "http://fileserver.com/uploads/2023/05/photo.png"
+                        },
+                        {
+                          "ph_id": "2",
+                          "phrep_path": "http://fileserver.com/uploads/2023/06/photo.png"
+                        }
+                      ]
+                    },
+                    {
+                      "phrep_id": "2",
+                      "phrep_description": "Семьи Марии тоже получила помощь",
+                      "phrep_created_at": "2012-04-23T20:25:43.511Z",
+                      "photos": [
+                        {
+                          "ph_id": "3",
+                          "phrep_path": "http://fileserver.com/uploads/2023/07/photo.png"
+                        },
+                        {
+                          "ph_id": "4",
+                          "phrep_path": "http://fileserver.com/uploads/2023/08/photo.png"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/documents": {
+      "get": {
+        "summary": "GET-запрос",
+        "description": "Возвращает JSON-объект с со списком документов",
+        "parameters": [
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Поле для сортировки",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["doc_id"]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "description": "Порядок сортировки",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": ["asc", "desc"],
+              "default": "desc"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Documents"
+                },
+                "example": {
+                  "documents": [
+                    {
+                      "doc_id": "1",
+                      "doc_path": "http://fileserver.com/uploads/2023/05/document1.pdf",
+                      "doc_name": "ОГРН"
+                    },
+                    {
+                      "doc_id": "2",
+                      "doc_path": "http://fileserver.com/uploads/2023/05/document2.pdf",
+                      "doc_name": "Свидетельство о гос. регистрации НКО"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/banking": {
+      "get": {
+        "summary": "GET-запрос",
+        "description": "Возвращает JSON-объект с реквизитами фонда",
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Banking"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/{f_id}": {
+      "get": {
+        "summary": "GET-запрос",
+        "description": "Возвращает JSON-объект с данными о семье по ID",
+        "parameters": [
+          {
+            "name": "f_id",
+            "in": "path",
+            "description": "id семьи, по которой нужно получить данные",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyByID"
+                },
+                "example": {
+                  "family": {
+                    "f_id": "1",
+                    "f_name": "Семья Натальи Калининой",
+                    "fph_main_path": "http://fileserver.com/uploads/2023/08/photo.png",
+                    "family_photos": [
+                      {
+                        "fph_id": "2",
+                        "fph_path": "http://fileserver.com/uploads/2023/09/photo.png"
+                      },
+                      {
+                        "fph_id": "3",
+                        "fph_path": "http://fileserver.com/uploads/2023/10/photo.png"
+                      }
+                    ],
+                    "f_short_desc": "Семья нуждается в помощи",
+                    "f_desc": "Семья сильно нуждается в помощи",
+                    "f_sum": "50000",
+                    "f_current_sum": "5000",
+                    "f_history": "Подробная история",
+                    "family_comments": [
+                      {
+                        "fcomm_id": "1",
+                        "fcomm_name": "Валерия И.",
+                        "fcomm_publish_date": "2012-04-23T18:25:46.511Z",
+                        "fcomm_text": "Удачи",
+                        "fcomm_likes": "4"
+                      },
+                      {
+                        "fcomm_id": "2",
+                        "fcomm_name": "Коля",
+                        "fcomm_publish_date": "2012-04-23T18:26:46.511Z",
+                        "fcomm_text": "Ура",
+                        "fcomm_likes": "0"
+                      }
+                    ]
+                  },
+                  "other_families": [
+                    {
+                      "other_f_id": "5",
+                      "other_f_name": "Семья Карениных",
+                      "other_fph_path": "http://fileserver.com/uploads/2023/11/photo.png",
+                      "other_f_created_at": "2012-04-23T18:27:46.511Z"
+                    },
+                    {
+                      "other_f_id": "6",
+                      "other_f_name": "Семья Строцких",
+                      "other_fph_path": "http://fileserver.com/uploads/2023/12/photo.png",
+                      "other_f_created_at": "2012-04-23T18:28:46.511Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/comment": {
+      "post": {
+        "summary": "POST-запрос для создания комментария семьи",
+        "description": "Отправляет JSON-объект с новым комментарием на для страницы семьи",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddFamilyComment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddFamilyCommentResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ошибка валидации данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/comment/like": {
+      "post": {
+        "summary": "POST-запрос, поставить лайк",
+        "description": "Отправляет JSON-объект с новым лайком для комментария на странице семьи",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LikeFamilyComment"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LikeFamilyCommentResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ошибка валидации данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/personalhelp_request": {
+      "post": {
+        "summary": "POST-запрос для заявки на личную помощь",
+        "description": "Отправляет JSON-объект с новой заявкой на личную помощь",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPersonalHelpRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "Сообщение об успешном создании заявки",
+                      "example": "Заявка успешно создана и отправлена в фонд."
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ошибка валидации данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Videos": {
+        "type": "object",
+        "properties": {
+          "video_reports": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vrep_id": {
+                  "type": "integer",
+                  "description": "Уникальный идентификатор фотоотчета"
+                },
+                "vrep_description": {
+                  "type": "string",
+                  "description": "Описание видеоотчета"
+                },
+                "vrep_link": {
+                  "type": "string",
+                  "description": "Ссылка на видео ВК"
+                },
+                "vrep_created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Дата и время добавления отчета в БД"
+                }
+              }
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "current_page": {
+                "type": "integer",
+                "description": "Текущая страница"
+              },
+              "per_page": {
+                "type": "integer",
+                "description": "Количество записей на странице"
+              },
+              "total": {
+                "type": "integer",
+                "description": "Общее количество записей"
+              },
+              "last_page": {
+                "type": "integer",
+                "description": "Номер последней страницы"
+              }
+            }
+          }
+        }
+      },
+      "Families": {
+        "type": "object",
+        "properties": {
+          "families": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "f_id": {
+                  "type": "integer",
+                  "description": "Уникальный идентификатор семьи"
+                },
+                "f_name": {
+                  "type": "string",
+                  "description": "Название семьи"
+                },
+                "fph_path": {
+                  "type": "string",
+                  "description": "Ссылка на основную фотографию семьи"
+                },
+                "f_short_desc": {
+                  "type": "string",
+                  "description": "Краткое описание семьи"
+                },
+                "f_desc": {
+                  "type": "string",
+                  "description": "Полное описание семьи"
+                },
+                "f_sum": {
+                  "type": "integer",
+                  "description": "Целевая сумма сбора"
+                },
+                "f_current_sum": {
+                  "type": "integer",
+                  "description": "Текущая сумма сбора"
+                },
+                "f_created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Дата и время добавления семьи в БД"
+                }
+              }
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "current_page": {
+                "type": "integer",
+                "description": "Текущая страница"
+              },
+              "per_page": {
+                "type": "integer",
+                "description": "Количество записей на странице"
+              },
+              "total": {
+                "type": "integer",
+                "description": "Общее количество записей"
+              },
+              "last_page": {
+                "type": "integer",
+                "description": "Номер последней страницы"
+              }
+            }
+          }
+        }
+      },
+      "MainPage": {
+        "type": "object",
+        "properties": {
+          "donations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "don_id": {
+                  "type": "integer",
+                  "description": "Уникальный идентификатор пожертвования"
+                },
+                "don_sum": {
+                  "type": "integer",
+                  "description": "Сумма пожертвования"
+                },
+                "don_name": {
+                  "type": "string",
+                  "description": "Имя благотворителя, может быть пустое"
+                },
+                "don_created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Дата и время добавления семьи в БД"
+                }
+              }
+            }
+          },
+          "blog": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "article_id": {
+                  "type": "integer",
+                  "description": "Уникальный идентификатор статьи"
+                },
+                "article_name": {
+                  "type": "string",
+                  "description": "Название статьи"
+                },
+                "article_publish_date": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Дата и время добавления статьи в БД"
+                }
+              }
+            }
+          },
+          "photo_reports": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "phrep_id": {
+                  "type": "integer",
+                  "description": "Уникальный идентификатор фотоотчета"
+                },
+                "phrep_description": {
+                  "type": "string",
+                  "description": "Описание фотоотчета"
+                },
+                "phrep_created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Дата добавления фотоотчета в БД"
+                },
+                "photos": {
+                  "type": "array",
+                  "items": {
+                    "properties": {
+                      "ph_id": {
+                        "type": "integer",
+                        "description": "Уникальный идентификатор фотографии"
+                      },
+                      "phrep_path": {
+                        "type": "string",
+                        "description": "Ссылка на фотографию"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "Documents": {
+        "type": "object",
+        "properties": {
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "doc_id": {
+                  "type": "integer",
+                  "description": "Уникальный идентификатор документа"
+                },
+                "doc_path": {
+                  "type": "string",
+                  "description": "Ссылка на документ"
+                },
+                "doc_name": {
+                  "type": "string",
+                  "description": "Название документа"
+                }
+              }
+            }
+          }
+        }
+      },
+      "Banking": {
+        "type": "object",
+        "properties": {
+          "banking_details": {
+            "type": "object",
+            "properties": {
+              "organization": {
+                "type": "string",
+                "description": "Название организации"
+              },
+              "inn": {
+                "type": "integer",
+                "description": "ИНН"
+              },
+              "kpp": {
+                "type": "integer",
+                "description": "КПП"
+              },
+              "ogrn": {
+                "type": "integer",
+                "description": "ОГРН"
+              },
+              "account": {
+                "type": "integer",
+                "description": "Расчетный счет"
+              },
+              "bik": {
+                "type": "integer",
+                "description": "БИК"
+              },
+              "bank": {
+                "type": "string",
+                "description": "Название банка"
+              },
+              "director": {
+                "type": "string",
+                "description": "Исполнительный директор"
+              },
+              "email": {
+                "type": "string",
+                "description": "Email"
+              },
+              "corr_account": {
+                "type": "integer",
+                "description": "Корреспондентский счет"
+              },
+              "address": {
+                "type": "string",
+                "description": "Адрес"
+              },
+              "purpose": {
+                "type": "string",
+                "description": "Назначение платежа"
+              },
+              "doc_path": {
+                "type": "string",
+                "description": "Ссылка на файл с реквизитами"
+              }
+            }
+          }
+        }
+      },
+      "FamilyByID": {
+        "type": "object",
+        "properties": {
+          "family": {
+            "type": "object",
+            "properties": {
+              "f_id": {
+                "type": "integer",
+                "description": "Уникальный идентификатор семьи"
+              },
+              "f_name": {
+                "type": "string",
+                "description": "Название семьи"
+              },
+              "fph_main_path": {
+                "type": "string",
+                "description": "Ссылка на основную фотографию семьи"
+              },
+              "family_photos": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "fph_id": {
+                      "type": "integer",
+                      "description": "Уникальный идентификатор фото"
+                    },
+                    "fph_path": {
+                      "type": "string",
+                      "description": "Ссылка на фото"
+                    }
+                  }
+                }
+              },
+              "f_short_desc": {
+                "type": "string",
+                "description": "Краткое описание семьи"
+              },
+              "f_desc": {
+                "type": "string",
+                "description": "Полное описание семьи"
+              },
+              "f_sum": {
+                "type": "integer",
+                "description": "Целевая сумма сбора"
+              },
+              "f_current_sum": {
+                "type": "integer",
+                "description": "Текущая сумма сбора"
+              },
+              "f_history": {
+                "type": "string",
+                "description": "История семьи"
+              },
+              "family_comments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "fcomm_id": {
+                      "type": "integer",
+                      "description": "Уникальный идентификатор комментария"
+                    },
+                    "fcomm_name": {
+                      "type": "string",
+                      "description": "Имя автора комментария"
+                    },
+                    "fcomm_publish_date": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "Дата и время публикации комментария"
+                    },
+                    "fcomm_text": {
+                      "type": "string",
+                      "description": "Текст комментария"
+                    },
+                    "fcomm_likes": {
+                      "type": "integer",
+                      "description": "Количество лайков комментария"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "other_families": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "other_f_id": {
+                  "type": "integer",
+                  "description": "Уникальный идентификатор семьи"
+                },
+                "other_f_name": {
+                  "type": "string",
+                  "description": "Название семьи"
+                },
+                "other_fph_path": {
+                  "type": "string",
+                  "description": "Ссылка на основную фотографию семьи"
+                },
+                "other_f_created_at": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Дата и время добавления семьи в БД"
+                }
+              }
+            }
+          }
+        }
+      },
+      "AddFamilyComment": {
+        "type": "object",
+        "properties": {
+          "f_id": {
+            "type": "integer",
+            "description": "ID статьи, к которой добавляется комментарий",
+            "example": "1"
+          },
+          "name": {
+            "type": "string",
+            "description": "Имя пользователя",
+            "example": "Иван"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email пользователя",
+            "example": "ivan@example.com"
+          },
+          "text": {
+            "type": "string",
+            "description": "Текст комментария",
+            "example": "Спасибо за статью!"
+          }
+        }
+      },
+      "AddFamilyCommentResponse": {
+        "type": "object",
+        "properties": {
+          "CommentAdded": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "ID созданного комментария",
+                "example": 1
+              },
+              "f_id": {
+                "type": "integer",
+                "description": "ID семьи",
+                "example": 1
+              },
+              "name": {
+                "type": "string",
+                "description": "Имя пользователя",
+                "example": "Иван"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "Email пользователя",
+                "example": "ivan@example.com"
+              },
+              "text": {
+                "type": "string",
+                "description": "Текст комментария",
+                "example": "Все будет хорошо!"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "Дата и время создания комментария",
+                "example": "2023-10-01T12:34:56Z"
+              }
+            }
+          }
+        }
+      },
+      "LikeFamilyComment": {
+        "type": "object",
+        "properties": {
+          "LikeFamilyComment": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "ID комментария, которому ставится лайк",
+                "example": "1"
+              }
+            }
+          }
+        }
+      },
+      "LikeFamilyCommentResponse": {
+        "type": "object",
+        "properties": {
+          "LikeAdded": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer",
+                "description": "ID созданного комментария",
+                "example": 1
+              },
+              "likes_count": {
+                "type": "integer",
+                "description": "Текущее количество лайков у комментария",
+                "example": 4
+              }
+            }
+          }
+        }
+      },
+      "AddPersonalHelpRequest": {
+        "type": "object",
+        "properties": {
+          "PersonalHelp": {
+            "type": "object",
+            "required": [
+              "surname",
+              "name",
+              "phone",
+              "email",
+              "city",
+              "fname",
+              "description"
+            ],
+            "properties": {
+              "surname": {
+                "type": "string",
+                "description": "Фамилия",
+                "example": "Иванов"
+              },
+              "name": {
+                "type": "string",
+                "description": "Имя",
+                "example": "Иван"
+              },
+              "patname": {
+                "type": "string",
+                "description": "Отчество",
+                "example": "Иванович"
+              },
+              "phone": {
+                "type": "string",
+                "description": "Номер телефона",
+                "example": "+79991234567"
+              },
+              "email": {
+                "type": "string",
+                "format": "email",
+                "description": "Электронная почта",
+                "example": "ivan@example.com"
+              },
+              "city": {
+                "type": "string",
+                "description": "Город",
+                "example": "Москва"
+              },
+              "fname": {
+                "type": "string",
+                "description": "Название семьи",
+                "example": "Натальи Калининой"
+              },
+              "description": {
+                "type": "string",
+                "description": "Описание для дополнительной инф",
+                "example": "Заинтересовала история семьи, хотелось бы напрямую помочь"
+              }
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Код ошибки"
+          },
+          "message": {
+            "type": "string",
+            "description": "Текст ошибки"
+          }
+        }
+      },
+      "ValidationErrorResponse": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer",
+            "description": "Код ошибки"
+          },
+          "message": {
+            "type": "string",
+            "description": "Сообщение об ошибке"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "field": {
+                  "type": "string",
+                  "description": "Поле, в котором произошла ошибка"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Сообщение об ошибке для конкретного поля"
+                }
+               }
+            }
+          }
+        }
+      }
+    }
+  }
+}

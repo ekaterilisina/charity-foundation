@@ -1,0 +1,128 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "NotiSend Email API",
+    "description": "API для отправки email-письма с заявкой на личную помощь",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.notisend.ru/v1",
+      "description": "Основной API endpoint"
+    },
+    {
+      "url": "https://api-reserve.msndr.net/v1",
+      "description": "Резервный endpoint (использовать при проблемах с основным)"
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/email/messages": {
+      "post": {
+        "summary": "Отправка email",
+        "description": "Создает и отправляет новый email с текстом заявки на личную помощь",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Сообщение успешно создано и поставлено в очередь",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Некорректные параметры запроса"
+          },
+          "401": {
+            "description": "Неавторизованный доступ"
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "schemas": {
+      "EmailRequest": {
+        "type": "object",
+        "required": [
+          "to",
+          "subject",
+          "text"
+        ],
+        "properties": {
+          "to": {
+            "type": "string",
+            "format": "email",
+            "description": "Email получателя"
+          },
+          "from_email": {
+            "type": "string",
+            "format": "email",
+            "default": "noreply@yourdomain.com",
+            "description": "Email отправителя"
+          },
+          "from_name": {
+            "type": "string",
+            "description": "Имя отправителя"
+          },
+          "subject": {
+            "type": "string",
+            "default": "Новая заявка на личную помощь",
+            "description": "Тема письма"
+          },
+          "text": {
+            "type": "string",
+            "description": "Текст письма"
+          },
+          "html": {
+            "type": "string",
+            "description": "HTML-версия письма (опционально)"
+          }
+        }
+      },
+      "EmailResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID отправленного сообщения"
+          },
+          "status": {
+            "type": "string",
+            "description": "Статус отправки"
+          },
+          "events": {
+            "type": "object",
+            "description": "События сообщения"
+          }
+        }
+      }
+    }
+  }
+}

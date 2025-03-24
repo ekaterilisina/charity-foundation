@@ -1,0 +1,1476 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "API для сайта благотворительного фонда",
+    "description": "API для работы с заявками, семьями, комментариями, лайками, волонтерами и другими функциями сайта.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://admin.pomogilichno.ru/api/v1",
+      "description": "Основной сервер API"
+    }
+  ],
+  "paths": {
+    "/help_request": {
+      "get": {
+        "summary": "GET-запрос",
+        "description": "Возвращает JSON-объект с данными: статистика, FAQ и фотоотчет.",
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "faq": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "question_id": {
+                            "type": "integer",
+                            "description": "уникальный идентификатор вопроса"
+                          },
+                          "question": {
+                            "type": "string",
+                            "description": "Текст вопроса."
+                          },
+                          "answer": {
+                            "type": "string",
+                            "description": "Текст ответа."
+                          },
+                          "question_type": {
+                            "type": "string",
+                            "description": "тип вопроса"
+                          }
+                        }
+                      }
+                    },
+                    "photo_report": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "image_id": {
+                            "type": "integer",
+                            "description": "уникальный идентификатор фотографии"
+                          },
+                          "image_url": {
+                            "type": "string",
+                            "description": "Ссылка на фотографию."
+                          },
+                          "image_name": {
+                            "type": "string",
+                            "description": "Название фотографии."
+                          }
+                        }
+                      }
+                    },
+                    "statistics": {
+                      "type": "object",
+                      "properties": {
+                        "total_products": {
+                          "type": "integer",
+                          "description": "Общее количество тонн продуктов онлайн и офлайн."
+                        },
+                        "total_families": {
+                          "type": "integer",
+                          "description": "Общее количество семей, получивших помощь."
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "faq": [
+                    {
+                      "question_id": 1,
+                      "question": "Мы отправили заявку больше месяца назад",
+                      "answer": "ответ на вопрос",
+                      "question_type": "заявка на помощь"
+                    },
+                    {
+                      "question_id": 2,
+                      "question": "Каким категориям нуждающихся вы помогаете?",
+                      "answer": "многодетным",
+                      "question_type": "заявка на помощь"
+                    }
+                  ],
+                  "photo_report": [
+                    {
+                      "image_id": 1,
+                      "image_url": "https://fileserver.com/images/123.jpg",
+                      "description": "Семья Анны Елизаровой"
+                    },
+                    {
+                      "image_id": 2,
+                      "image_url": "https://fileserver.com/images/456.jpg",
+                      "description": "Волонтер Яна"
+                    }
+                  ],
+                  "statistics": {
+                    "total_products": 1000,
+                    "total_families": 100
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/applications": {
+  "post": {
+    "summary": "Создание заявки на помощь",
+    "description": "Создает новую заявку на помощь, сохраняет её в базе данных и отправляет уведомление на почту фонда.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/ApplicationRequest"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Заявка успешно создана",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Сообщение об успешном создании заявки",
+                  "example": "Заявка успешно создана и отправлена в фонд."
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Неверные данные заявки",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "Текст ошибки",
+                  "example": "Неверный формат данных"
+                }
+              }
+            }
+          }
+        }
+      },
+      "422": {
+        "description": "Необрабатываемый запрос",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string",
+                        "description": "Поле, в котором произошла ошибка",
+                        "example": "phone"
+                      },
+                      "message": {
+                        "type": "string",
+                        "description": "Сообщение об ошибке",
+                        "example": "Номер телефона должен содержать 11 цифр"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "example": {
+              "errors": [
+                {
+                  "field": "phone",
+                  "message": "Номер телефона должен содержать 11 цифр"
+                },
+                {
+                  "field": "email",
+                  "message": "Некорректный формат email"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Ошибка сервера",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "Текст ошибки",
+                  "example": "Внутренняя ошибка сервера"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+},
+    "/support/questions": {
+  "post": {
+    "summary": "Задать вопрос",
+    "description": "Создает новый вопрос, сохраняет его в базе данных и отправляет уведомление на почту фонда.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/HelpQuestion"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Вопрос отправлен",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Сообщение об успешной отправке вопроса",
+                  "example": "Вопрос успешно создан и отправлен в фонд."
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Неверные данные вопроса",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "Текст ошибки",
+                  "example": "Неверный формат данных"
+                }
+              }
+            }
+          }
+        }
+      },
+      "422": {
+        "description": "Необрабатываемый запрос",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string",
+                        "description": "Поле, в котором произошла ошибка",
+                        "example": "description"
+                      },
+                      "message": {
+                        "type": "string",
+                        "description": "Сообщение об ошибке",
+                        "example": "Описание вопроса не может быть пустым"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "example": {
+              "errors": [
+                {
+                  "field": "description",
+                  "message": "Описание вопроса не может быть пустым"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Ошибка сервера",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "Текст ошибки",
+                  "example": "Внутренняя ошибка сервера"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+},
+    "/volunteer/request": {
+  "post": {
+    "summary": "Отправить заявку",
+    "description": "Создает новую заявку на волонтерство, сохраняет её в базе данных и отправляет уведомление на почту фонда.",
+    "requestBody": {
+      "required": true,
+      "content": {
+        "application/json": {
+          "schema": {
+            "$ref": "#/components/schemas/VolunteerRequest"
+          }
+        }
+      }
+    },
+    "responses": {
+      "201": {
+        "description": "Заявка отправлена",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Сообщение об успешной отправке заявки",
+                  "example": "Заявка успешно создана и отправлена в фонд."
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Неверные данные заявки",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "Текст ошибки",
+                  "example": "Неверный формат данных"
+                }
+              }
+            }
+          }
+        }
+      },
+      "422": {
+        "description": "Необрабатываемый запрос",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "errors": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "field": {
+                        "type": "string",
+                        "description": "Поле, в котором произошла ошибка",
+                        "example": "phone"
+                      },
+                      "message": {
+                        "type": "string",
+                        "description": "Сообщение об ошибке",
+                        "example": "Номер телефона должен содержать 11 цифр"
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "example": {
+              "errors": [
+                {
+                  "field": "phone",
+                  "message": "Номер телефона должен содержать 11 цифр"
+                },
+                {
+                  "field": "email",
+                  "message": "Некорректный формат email"
+                }
+              ]
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Ошибка сервера",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "error": {
+                  "type": "string",
+                  "description": "Текст ошибки",
+                  "example": "Внутренняя ошибка сервера"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+},
+    "/volunteer/faq": {
+      "get": {
+        "summary": "Получить FAQ для волонтеров",
+        "description": "Возвращает список вопросов и ответов, относящихся к волонтерству.",
+        "responses": {
+          "200": {
+            "description": "Список FAQ успешно получен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FAQList"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+   "/blog/articles": {
+  "get": {
+    "summary": "Получить список статей блога",
+    "description": "Возвращает список статей блога с пагинацией. Изображения статей хранятся на файловом сервере и загружаются напрямую по ссылкам из поля `image_url`.",
+    "parameters": [
+      {
+        "name": "page",
+        "in": "query",
+        "description": "Номер страницы",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      {
+        "name": "per_page",
+        "in": "query",
+        "description": "Количество статей на странице",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "example": 8
+        }
+      },
+      {
+        "name": "created_at_from",
+        "in": "query",
+        "description": "Фильтр по дате создания (начальная дата)",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-01-01T00:00:00Z"
+        }
+      },
+      {
+        "name": "created_at_to",
+        "in": "query",
+        "description": "Фильтр по дате создания (конечная дата)",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-12-31T23:59:59Z"
+        }
+      },
+      {
+        "name": "sort_by",
+        "in": "query",
+        "description": "Сортировка по ID (asc или desc)",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": ["asc", "desc"],
+          "example": "asc"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Список статей успешно получен",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/BlogArticleList"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Ошибка сервера"
+      }
+    }
+  }
+},
+    "/articles/{articleId}": {
+      "get": {
+        "summary": "Получить статью и комментарии",
+        "description": "Возвращает данные статьи и список комментариев к ней. Изображения статей хранятся на файловом сервере и загружаются напрямую по ссылкам из поля `image_url`.",
+        "parameters": [
+          {
+            "name": "articleId",
+            "in": "path",
+            "description": "ID статьи",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Данные статьи и комментарии успешно получены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArticleWithCommentsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Статья не найдена"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/articles/comment": {
+      "post": {
+        "summary": "Добавить комментарий к статье",
+        "description": "Создает новый комментарий к указанной статье.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Комментарий успешно добавлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommentResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные комментария"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+    "/articles/comment/{commentId}/like": {
+      "post": {
+        "summary": "Поставить лайк комментарию",
+        "description": "Добавляет лайк к указанному комментарию.",
+        "parameters": [
+          {
+            "name": "commentId",
+            "in": "path",
+            "description": "ID комментария",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Лайк успешно добавлен",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LikeResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Комментарий не найден"
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    },
+  "/helped": {
+  "get": {
+    "summary": "Получить список фотографий с подписями",
+    "description": "Возвращает список фотографий с подписями и пагинацией. Изображения хранятся на файловом сервере и загружаются напрямую по ссылкам из поля `image_url`.",
+    "parameters": [
+      {
+        "name": "page",
+        "in": "query",
+        "description": "Номер страницы",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "example": 1
+        }
+      },
+      {
+        "name": "per_page",
+        "in": "query",
+        "description": "Количество записей на странице",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "example": 20
+        }
+      },
+      {
+        "name": "created_at_from",
+        "in": "query",
+        "description": "Фильтр по дате создания (начальная дата)",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-01-01T00:00:00Z"
+        }
+      },
+      {
+        "name": "created_at_to",
+        "in": "query",
+        "description": "Фильтр по дате создания (конечная дата)",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "format": "date-time",
+          "example": "2023-12-31T23:59:59Z"
+        }
+      },
+      {
+        "name": "sort_by",
+        "in": "query",
+        "description": "Сортировка по ID (asc или desc)",
+        "required": false,
+        "schema": {
+          "type": "string",
+          "enum": ["asc", "desc"],
+          "example": "asc"
+        }
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Список фотографий с подписями успешно получен",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/HelpedList"
+            }
+          }
+        }
+      },
+      "500": {
+        "description": "Ошибка сервера"
+      }
+    }
+  }
+},
+    "/admin/families": {
+      "get": {
+        "summary": "Получить список семей",
+        "description": "Возвращает список карточек семей с пагинацией и возможностью редактирования.",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Номер страницы для пагинации",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Количество семей на странице",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 10
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешный запрос",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "families": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/FamilyResponse"
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer",
+                          "description": "Текущая страница"
+                        },
+                        "per_page": {
+                          "type": "integer",
+                          "description": "Количество записей на странице"
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "Общее количество записей"
+                        },
+                        "last_page": {
+                          "type": "integer",
+                          "description": "Номер последней страницы"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "families": [
+                    {
+                      "f_id": 1,
+                      "f_name": "Семьи Марии",
+                      "fph_path": "http://fileserver.com/uploads/2023/03/photo.png",
+                      "f_short_desc": "Хорошая семья",
+                      "f_desc": "Очень хорошая семья",
+                      "f_sum": 50000,
+                      "f_current_sum": 0,
+                      "f_created_at": "2012-04-23T18:25:43.511Z",
+                      "can_edit": true
+                    }
+                  ],
+                  "pagination": {
+                    "current_page": 1,
+                    "per_page": 4,
+                    "total": 8,
+                    "last_page": 2
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Данные не найдены",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Данные не найдены"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Создать новую карточку семьи",
+        "description": "Создает новую карточку семьи с указанными данными.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFamilyRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Карточка семьи успешно создана",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверные данные",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Ошибка сервера"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApplicationRequest": {
+        "type": "object",
+        "required": [
+          "surname",
+          "name",
+          "phone",
+          "city",
+          "fname",
+          "description"
+        ],
+        "properties": {
+          "surname": {
+            "type": "string",
+            "description": "Фамилия",
+            "example": "Иванов"
+          },
+          "name": {
+            "type": "string",
+            "description": "Имя",
+            "example": "Иван"
+          },
+          "patname": {
+            "type": "string",
+            "description": "Отчество",
+            "example": "Иванович"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Номер телефона",
+            "example": "+79991234567"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Электронная почта",
+            "example": "ivan@example.com"
+          },
+          "city": {
+            "type": "string",
+            "description": "Город",
+            "example": "Москва"
+          },
+          "fname": {
+            "type": "string",
+            "description": "Район",
+            "example": "Выхино-Жулебино"
+          },
+          "description": {
+            "type": "string",
+            "description": "Сообщение с описанием проблемы",
+            "example": "Нужна помощь с оплатой лечения."
+          }
+        }
+      },
+      "HelpQuestion": {
+        "type": "object",
+        "required": [
+          "surname",
+          "name",
+          "phone",
+          "city",
+          "description"
+        ],
+        "properties": {
+          "surname": {
+            "type": "string",
+            "description": "Фамилия",
+            "example": "Иванов"
+          },
+          "name": {
+            "type": "string",
+            "description": "Имя",
+            "example": "Иван"
+          },
+          "patname": {
+            "type": "string",
+            "description": "Отчество",
+            "example": "Иванович"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Номер телефона",
+            "example": "+79991234567"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Электронная почта",
+            "example": "ivan@example.com"
+          },
+          "city": {
+            "type": "string",
+            "description": "Город",
+            "example": "Москва"
+          },
+          "description": {
+            "type": "string",
+            "description": "Сообщение с описанием проблемы",
+            "example": "Нет ответа на заявку."
+          }
+        }
+      },
+      "VolunteerRequest": {
+        "type": "object",
+        "required": [
+          "surname",
+          "name",
+          "phone",
+          "city"
+        ],
+        "properties": {
+          "surname": {
+            "type": "string",
+            "description": "Фамилия",
+            "example": "Иванов"
+          },
+          "name": {
+            "type": "string",
+            "description": "Имя",
+            "example": "Иван"
+          },
+          "patname": {
+            "type": "string",
+            "description": "Отчество",
+            "example": "Иванович"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Номер телефона",
+            "example": "+79991234567"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Электронная почта",
+            "example": "ivan@example.com"
+          },
+          "city": {
+            "type": "string",
+            "description": "Город",
+            "example": "Москва"
+          },
+          "bday": {
+            "type": "string",
+            "format": "date",
+            "description": "Дата рождения в формате YYYY-MM-DD",
+            "example": "1990-01-01"
+          },
+          "photo_link": {
+            "type": "string",
+            "format": "uri",
+            "description": "Ссылка на фото",
+            "example": "https://example.com/photos/1.jpg"
+          },
+          "occupation": {
+            "type": "string",
+            "description": "Род занятий",
+            "example": "Учитель русского языка."
+          },
+          "organization": {
+            "type": "string",
+            "description": "Являлись ли вы ранее волонтером какой-либо другой организации, если да – укажите какой?",
+            "example": "Фонд Анжелы Вавиловой"
+          },
+          "experience": {
+            "type": "string",
+            "description": "Есть ли у вас опыт, который может быть применим к волонтерству в нашем Благотворительном фонде? Если есть расскажите о нем.",
+            "example": "Проводил уроки детям фонда"
+          }
+        }
+      },
+      "FAQItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор вопроса",
+            "example": 1
+          },
+          "question": {
+            "type": "string",
+            "description": "Текст вопроса",
+            "example": "Как стать волонтером?"
+          },
+          "answer": {
+            "type": "string",
+            "description": "Текст ответа",
+            "example": "Заполните заявку на нашем сайте."
+          }
+        }
+      },
+      "FAQList": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/FAQItem"
+        }
+      },
+      "BlogArticle": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор статьи",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Заголовок статьи",
+            "example": "Как помочь фонду?"
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Ссылка на изображение статьи, хранящееся на файловом сервере",
+            "example": "https://fileserver.example.com/images/1.jpg"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Дата и время публикации статьи",
+            "example": "2023-10-01T12:34:56Z"
+          }
+        }
+      },
+      "BlogArticleList": {
+        "type": "object",
+        "properties": {
+          "articles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BlogArticle"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "current_page": {
+                "type": "integer",
+                "description": "Текущая страница",
+                "example": 1
+              },
+              "per_page": {
+                "type": "integer",
+                "description": "Количество записей на странице",
+                "example": 8
+              },
+              "total": {
+                "type": "integer",
+                "description": "Общее количество записей",
+                "example": 80
+              },
+              "last_page": {
+                "type": "integer",
+                "description": "Номер последней страницы",
+                "example": 10
+              }
+            }
+          }
+        }
+      },
+      "Article": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор статьи",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Заголовок статьи",
+            "example": "Как помочь фонду?"
+          },
+          "text": {
+            "type": "string",
+            "description": "Текст статьи",
+            "example": "В этой статье мы расскажем, как вы можете помочь нашему фонду."
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Ссылка на изображение статьи, хранящееся на файловом сервере",
+            "example": "https://fileserver.example.com/images/1.jpg"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Дата и время публикации статьи",
+            "example": "2023-10-01T12:34:56Z"
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор комментария",
+            "example": 1
+          },
+          "article_id": {
+            "type": "integer",
+            "description": "ID статьи, к которой относится комментарий",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Имя автора комментария",
+            "example": "Иван"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email автора комментария",
+            "example": "ivan@example.com"
+          },
+          "text": {
+            "type": "string",
+            "description": "Текст комментария",
+            "example": "Отличная статья!"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Дата и время создания комментария",
+            "example": "2023-10-01T13:00:00Z"
+          }
+        }
+      },
+      "ArticleWithCommentsResponse": {
+        "type": "object",
+        "properties": {
+          "article": {
+            "$ref": "#/components/schemas/Article"
+          },
+          "comments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Comment"
+            }
+          }
+        }
+      },
+      "AddCommentRequest": {
+        "type": "object",
+        "required": [
+          "article_id",
+          "name",
+          "email",
+          "text"
+        ],
+        "properties": {
+          "article_id": {
+            "type": "integer",
+            "description": "ID статьи, к которой добавляется комментарий",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Имя пользователя",
+            "example": "Иван"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email пользователя",
+            "example": "ivan@example.com"
+          },
+          "text": {
+            "type": "string",
+            "description": "Текст комментария",
+            "example": "Спасибо за статью!"
+          }
+        }
+      },
+      "CommentResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID созданного комментария",
+            "example": 1
+          },
+          "article_id": {
+            "type": "integer",
+            "description": "ID статьи",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "Имя пользователя",
+            "example": "Иван"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email пользователя",
+            "example": "ivan@example.com"
+          },
+          "text": {
+            "type": "string",
+            "description": "Текст комментария",
+            "example": "Спасибо за статью!"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Дата и время создания комментария",
+            "example": "2023-10-01T12:34:56Z"
+          }
+        }
+      },
+      "LikeResponse": {
+        "type": "object",
+        "properties": {
+          "comment_id": {
+            "type": "integer",
+            "description": "ID комментария",
+            "example": 1
+          },
+          "likes_count": {
+            "type": "integer",
+            "description": "Общее количество лайков у комментария",
+            "example": 5
+          }
+        }
+      },
+      "HelpedItem": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор записи",
+            "example": 1
+          },
+          "image_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Ссылка на фотографию, хранящуюся на файловом сервере",
+            "example": "https://fileserver.example.com/images/1.jpg"
+          },
+          "caption": {
+            "type": "string",
+            "description": "Подпись к фотографии",
+            "example": "Иван, 10 лет. Переданы вещи."
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Дата и время публикации",
+            "example": "2023-10-01T12:34:56Z"
+          }
+        }
+      },
+      "HelpedList": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/HelpedItem"
+            }
+          },
+          "pagination": {
+            "type": "object",
+            "properties": {
+              "current_page": {
+                "type": "integer",
+                "description": "Текущая страница",
+                "example": 1
+              },
+              "per_page": {
+                "type": "integer",
+                "description": "Количество записей на странице",
+                "example": 8
+              },
+              "total": {
+                "type": "integer",
+                "description": "Общее количество записей",
+                "example": 80
+              },
+              "last_page": {
+                "type": "integer",
+                "description": "Номер последней страницы",
+                "example": 10
+              }
+            }
+          }
+        }
+      },
+      "FamilyResponse": {
+        "type": "object",
+        "properties": {
+          "f_id": {
+            "type": "integer",
+            "description": "Уникальный идентификатор семьи"
+          },
+          "f_name": {
+            "type": "string",
+            "description": "Название семьи"
+          },
+          "fph_path": {
+            "type": "string",
+            "description": "Ссылка на основную фотографию семьи"
+          },
+          "f_short_desc": {
+            "type": "string",
+            "description": "Краткое описание семьи"
+          },
+          "f_desc": {
+            "type": "string",
+            "description": "Полное описание семьи"
+          },
+          "f_sum": {
+            "type": "integer",
+            "description": "Целевая сумма сбора"
+          },
+          "f_current_sum": {
+            "type": "integer",
+            "description": "Текущая сумма сбора"
+          },
+          "f_created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Дата и время добавления семьи в БД"
+          },
+          "can_edit": {
+            "type": "boolean",
+            "description": "Возможность редактирования карточки"
+          }
+        }
+      },
+      "CreateFamilyRequest": {
+        "type": "object",
+        "required": [
+          "f_name",
+          "fph_path",
+          "f_short_desc",
+          "f_desc",
+          "f_sum"
+        ],
+        "properties": {
+          "f_name": {
+            "type": "string",
+            "description": "Название семьи",
+            "example": "Семьи Марии"
+          },
+          "fph_path": {
+            "type": "string",
+            "description": "Ссылка на основную фотографию семьи",
+            "example": "http://fileserver.com/uploads/2023/03/photo.png"
+          },
+          "f_short_desc": {
+            "type": "string",
+            "description": "Краткое описание семьи",
+            "example": "Хорошая семья"
+          },
+          "f_desc": {
+            "type": "string",
+            "description": "Полное описание семьи",
+            "example": "Очень хорошая семья"
+          },
+          "f_sum": {
+            "type": "integer",
+            "description": "Целевая сумма сбора",
+            "example": 50000
+          }
+        }
+      }
+    }
+  }
+}

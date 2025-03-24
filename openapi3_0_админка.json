@@ -1,0 +1,1705 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Запросы для разделов (Блог, Кому помогли) в административной панели",
+    "version": "1.0.0",
+    "description": "API для получения, создания, редактирования, просмотра, удаления статей в разделе \"Блог\" и карточек в разделе \"Кому помогли\" в административной панели"
+  },
+  "servers": [
+    {
+      "url": "https://admin.pomogilichno.ru/api/v1"
+    }
+  ],
+  "tags": [
+    {
+      "name": "blog",
+      "description": "Операции со статьями раздела \"Блог\""
+    },
+    {
+      "name": "photo_reports",
+      "description": "Операции с карточками раздела \"Кому помогли\""
+    }
+  ],
+  "paths": {
+    "/api/blog": {
+      "get": {
+        "tags": [
+          "blog"
+        ],
+        "summary": "Получение списка статей",
+        "description": "Возвращает список всех статей с заголовками и изображениями",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Номер страницы для пагинации",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Количество статей на странице",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Сортировка по ID (asc/desc)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Фильтрация по дате создания (после указанной даты)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Фильтрация по дате создания (до указанной даты)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно загруженные статьи",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "blog": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "article_id": {
+                            "type": "integer",
+                            "description": "Уникальный идентификатор статьи"
+                          },
+                          "article_name": {
+                            "type": "string",
+                            "description": "Заголовок статьи"
+                          },
+                          "article_photo": {
+                            "type": "string",
+                            "description": "Превью статьи"
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer",
+                          "description": "Текущая страница"
+                        },
+                        "per_page": {
+                          "type": "integer",
+                          "description": "Количество записей на странице"
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "Общее количество записей"
+                        },
+                        "last_page": {
+                          "type": "integer",
+                          "description": "Номер последней страницы"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "blog": [
+                    {
+                      "article_id": "1",
+                      "article_name": "Каждое дерево - живое интервью с волонтером",
+                      "article_photo": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg"
+                    },
+                    {
+                      "article_id": "2",
+                      "article_name": "Помощь бездомным",
+                      "article_photo": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg"
+                    },
+                    {
+                      "article_id": "3",
+                      "article_name": "Благотворительность вместо сувениров",
+                      "article_photo": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg"
+                    },
+                    {
+                      "article_id": "4",
+                      "article_name": "Помощь малоимущим",
+                      "article_photo": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg"
+                    }
+                  ],
+                  "pagination": [
+                    {
+                      "current_page": "1",
+                      "per_page": "4",
+                      "total": "8",
+                      "last_page": "2"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/blog/article_id/edit": {
+      "get": {
+        "tags": [
+          "blog"
+        ],
+        "summary": "Получение статьи по ID",
+        "description": "Возвращает статью с указанным ID",
+        "parameters": [
+          {
+            "name": "article_id",
+            "in": "query",
+            "description": "Уникальный идентификатор статьи",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999999
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Сортировка по ID (asc/desc)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Фильтрация по дате создания (после указанной даты)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Фильтрация по дате создания (до указанной даты)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно полученная статья",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "article_id": {
+                      "type": "integer",
+                      "description": "Уникальный идентификатор статьи"
+                    },
+                    "article_name": {
+                      "type": "string",
+                      "description": "Заголовок статьи"
+                    },
+                    "article_text": {
+                      "type": "string",
+                      "description": "Текст статьи"
+                    },
+                    "article_photo": {
+                      "type": "string",
+                      "description": "Превью статьи"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "article_publish_date": {
+                          "type": "string",
+                          "format": "date",
+                          "description": "Дата публикации статьи"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "article_id": "1",
+                    "article_name": "Каждое дерево - живое интервью с волонтером",
+                    "article_text": "Специально для нашего блога, мы провели интервью с волонтером...",
+                    "article_photo": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg",
+                    "vrep_created_at": "2012-04-23"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/blog/article_id/": {
+      "put": {
+        "tags": [
+          "blog"
+        ],
+        "summary": "Редактирование статьи",
+        "description": "Обновляет статью, включая заголовок, описание и изображение",
+        "parameters": [
+          {
+            "name": "article_id",
+            "in": "query",
+            "description": "Уникальный идентификатор статьи",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999999
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "article_name": {
+                    "type": "string",
+                    "description": "Заголовок статьи"
+                  },
+                  "article_text": {
+                    "type": "string",
+                    "description": "Текст статьи"
+                  },
+                  "article_photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Изображение статьи"
+                  }
+                },
+                "required": [
+                  "article_name",
+                  "article_text"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Статья успешно обновлена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "article_id": {
+                      "type": "integer"
+                    },
+                    "article_name": {
+                      "type": "string"
+                    },
+                    "article_text": {
+                      "type": "string"
+                    },
+                    "article_photo": {
+                      "type": "string"
+                    },
+                    "article_publish_date": {
+                      "type": "string",
+                      "format": "date"
+                    }
+                  }
+                },
+                "example": {
+                  "blog": [
+                    {
+                      "article_id": "1",
+                      "article_name": "Каждое дерево - живое интервью с волонтером",
+                      "article_text": "Специально для нашего блога, мы провели интервью с волонтером...",
+                      "article_photo": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg"
+                    },
+                    {
+                      "article_publish_date": "2012-04-23"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/blog/article_id/new": {
+      "post": {
+        "tags": [
+          "blog"
+        ],
+        "summary": "Создание новой статьи",
+        "description": "Создает статью с заголовком, описанием и изображением",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "article_name": {
+                    "type": "string",
+                    "description": "Заголовок статьи"
+                  },
+                  "article_text": {
+                    "type": "string",
+                    "description": "Основной контент статьи"
+                  },
+                  "article_photo": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Изображение статьи"
+                  }
+                },
+                "required": [
+                  "article_name",
+                  "article_text",
+                  "article_photo"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Статья успешно создана",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "article_id": {
+                      "type": "integer",
+                      "description": "ID созданной статьи"
+                    },
+                    "article_name": {
+                      "type": "string"
+                    },
+                    "article_text": {
+                      "type": "string"
+                    },
+                    "article_photo": {
+                      "type": "string",
+                      "description": "Ссылка на изображение"
+                    },
+                    "article_publish_date": {
+                      "type": "string",
+                      "format": "date"
+                    }
+                  }
+                },
+                "example": {
+                  "blog": [
+                    {
+                      "article_id": "1",
+                      "article_name": "Каждое дерево - живое интервью с волонтером",
+                      "article_text": "Специально для нашего блога, мы провели интервью с волонтером...",
+                      "article_photo": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg",
+                      "article_publish_date": "2012-04-23"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/blog/article_id": {
+      "delete": {
+        "tags": [
+          "blog"
+        ],
+        "summary": "Удаление статьи по ID",
+        "description": "Удаляет статью из системы. Удаляет данные из БД, файлы с сервера файлов и кеши",
+        "parameters": [
+          {
+            "name": "article_id",
+            "in": "query",
+            "description": "Уникальный идентификатор статьи",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999999
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Успешно удаленная статья",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "article_id": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Статья удалена"
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "article_id": "1",
+                    "article_name": "Каждое дерево - живое интервью с волонтером",
+                    "description": "Статья удалена"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/photo_reports": {
+      "get": {
+        "tags": [
+          "photo_reports"
+        ],
+        "summary": "Получение списка \"Кому помогли\"",
+        "description": "Возвращает список всех карточек семей \"Кому помогли\"",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Номер страницы для пагинации",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Количество карточек на странице, должно быть 4",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 4
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Сортировка по ID (asc/desc)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Фильтрация по дате создания (после указанной даты)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Фильтрация по дате создания (до указанной даты)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно загруженные карточки",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "photo_reports": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "phrep_id": {
+                            "type": "integer",
+                            "description": "Уникальный идентификатор карточки"
+                          },
+                          "phrep_description": {
+                            "type": "string",
+                            "description": "Описание карточки"
+                          },
+                          "phrep_path": {
+                            "type": "string",
+                            "description": "Изображение"
+                          },
+                          "phrep_created_at": {
+                            "type": "string",
+                            "description": "Дата создания карточки"
+                          }
+                        }
+                      }
+                    },
+                    "pagination": {
+                      "type": "object",
+                      "properties": {
+                        "current_page": {
+                          "type": "integer",
+                          "description": "Текущая страница"
+                        },
+                        "per_page": {
+                          "type": "integer",
+                          "description": "Количество записей на странице"
+                        },
+                        "total": {
+                          "type": "integer",
+                          "description": "Общее количество записей"
+                        },
+                        "last_page": {
+                          "type": "integer",
+                          "description": "Номер последней страницы"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "photo_reports": [
+                    {
+                      "phrep_id": "1",
+                      "phrep_description": "Семья Елены Елизаровой",
+                      "phrep_path": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg",
+                      "phrep_created_at": "2012-04-23"
+                    },
+                    {
+                      "phrep_id": "2",
+                      "phrep_description": "Семья Ольги Полуэктовой",
+                      "phrep_path": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg",
+                      "phrep_created_at": "2012-04-23"
+                    },
+                    {
+                      "phrep_id": "3",
+                      "phrep_description": "Семья Елены Фоминой",
+                      "phrep_path": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg",
+                      "phrep_created_at": "2012-04-23"
+                    },
+                    {
+                      "phrep_id": "4",
+                      "phrep_description": "Семья Алены Ивановой",
+                      "phrep_path": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg",
+                      "phrep_created_at": "2012-04-23"
+                    }
+                  ],
+                  "pagination": [
+                    {
+                      "current_page": "1",
+                      "per_page": "4",
+                      "total": "8",
+                      "last_page": "2"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/photo_reports/phrep_id/edit": {
+      "get": {
+        "tags": [
+          "photo_reports"
+        ],
+        "summary": "Получение карточки по ID",
+        "description": "Возвращает карточку с указанным ID",
+        "parameters": [
+          {
+            "name": "phrep_id",
+            "in": "query",
+            "description": "Уникальный идентификатор карточки",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999999
+            }
+          },
+          {
+            "name": "sort_by",
+            "in": "query",
+            "description": "Сортировка по ID (asc/desc)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "created_after",
+            "in": "query",
+            "description": "Фильтрация по дате создания (после указанной даты)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "created_before",
+            "in": "query",
+            "description": "Фильтрация по дате создания (до указанной даты)",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Успешно полученная карточка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "phrep_id": {
+                      "type": "integer",
+                      "description": "Уникальный идентификатор карточки"
+                    },
+                    "phrep_description": {
+                      "type": "string",
+                      "description": "Описание карточки"
+                    },
+                    "ph_id": {
+                      "type": "string",
+                      "description": "Изображение"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {
+                        "phrep_created_at": {
+                          "type": "string",
+                          "format": "date",
+                          "description": "Дата создания карточки"
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "phrep_id": "1",
+                    "phrep_description": "Семья Елены Елизаровой получила продуктовую помощь от благотворительного фонда \"Помоги лично\"",
+                    "phrep_path": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg",
+                    "phrep_created_at": "2012-04-23"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/photo_reports/phrep_id/": {
+      "put": {
+        "tags": [
+          "photo_reports"
+        ],
+        "summary": "Редактирование карточки",
+        "description": "Обновляет карточку включая описание и изображения",
+        "parameters": [
+          {
+            "name": "phrep_id",
+            "in": "query",
+            "description": "Уникальный идентификатор карточки",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 999999
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phrep_description": {
+                    "type": "string",
+                    "description": "Описание карточки"
+                  },
+                  "photo_in_reports": {
+                    "type": "array",
+                    "description": "Изображение в карточке",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "ph_id": {
+                          "type": "string",
+                          "description": "Уникальный идентификатор изображения"
+                        },
+                        "phrep_path": {
+                          "type": "string",
+                          "format": "binary",
+                          "description": "Ссылка на изображение"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "phrep_description",
+                  "photo_in_report"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Карточка успешно обновлена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "phrep_id": {
+                      "type": "integer"
+                    },
+                    "phrep_description": {
+                      "type": "string"
+                    },
+                    "phrep_path": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "phrep_created_at": {
+                      "type": "string",
+                      "format": "date"
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "phrep_id": "1",
+                    "phrep_description": "Семья Елены Елизаровой получила продуктовую помощь от благотворительного фонда \"Помоги лично\"",
+                    "phrep_path": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg",
+                    "phrep_created_at": "2012-04-23"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/photo_reports/phrep_id/new": {
+      "post": {
+        "tags": [
+          "photo_reports"
+        ],
+        "summary": "Создание новой карточки",
+        "description": "Создает карточку описанием и изображением",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phrep_description": {
+                    "type": "string",
+                    "description": "Описание карточки"
+                  },
+                  "photo_in_report": {
+                    "type": "array",
+                    "description": "Изображение в карточке",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "ph_id": {
+                          "type": "string",
+                          "description": "Уникальный идентификатор изображения"
+                        },
+                        "phrep_path": {
+                          "type": "string",
+                          "format": "binary",
+                          "description": "Ссылка на изображение"
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": [
+                  "phrep_description",
+                  "photo_in_report"
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Карточка успешно создана",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "phrep_id": {
+                      "type": "integer",
+                      "description": "ID созданной карточки"
+                    },
+                    "phrep_description": {
+                      "description": "Описание карточки",
+                      "type": "string"
+                    },
+                    "phrep_path": {
+                      "type": "array",
+                      "description": "Изображения в карточке",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "phrep_created_at": {
+                      "type": "string",
+                      "format": "date"
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "phrep_id": "1",
+                    "phrep_description": "Семья Елены Елизаровой получила продуктовую помощь от благотворительного фонда \"Помоги лично\"",
+                    "phrep_path": "https://i.pinimg.com/originals/ae/dc/8f/aedc8fd834bb47325556acc63b52b441.jpg",
+                    "phrep_created_at": "2012-04-23"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/photo_reports/phrep_id": {
+      "delete": {
+        "tags": [
+          "photo_reports"
+        ],
+        "summary": "Удаление карточки по ID",
+        "description": "Удаляет карточки из системы. Удаляет данные из БД, файлы с сервера файлов и кеши",
+        "parameters": [
+          {
+            "name": "phrep_id",
+            "in": "query",
+            "description": "Уникальный идентификатор карточки",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Успешно удаленная карточка",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "phrep_id": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Карточка удалена"
+                    }
+                  }
+                },
+                "example": [
+                  {
+                    "phrep_id": "1",
+                    "phrep_description": "Семья Елены Елизаровой получила продуктовую помощь от благотворительного фонда \"Помоги лично\"",
+                    "description": "Карточка удалена"
+                  }
+                ]
+              }
+            }
+          },
+          "400": {
+            "description": "Неверный формат данных",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверный формат данных"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Страница не найдена",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Страница не найдена"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Неверные данные запроса",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Неверные данные запроса"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Внутренняя ошибка сервера",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Текст ошибки",
+                      "example": "Внутренняя ошибка сервера"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
